@@ -94,6 +94,13 @@ func ErrorVerbosity() bool {
 	return logLevelValues[logger.logLevel] >= logLevelValues[common.LogLevelError]
 }
 
+// Debug2Verbosity reports whether the logger is configured at (or above) debug2 verbosity.
+// Call sites that build expensive or risky debug strings should check this before doing the
+// work, since arguments to Debug2f are evaluated eagerly regardless of whether they get printed.
+func Debug2Verbosity() bool {
+	return logLevelValues[logger.logLevel] >= logLevelValues[common.LogLevelDebug2]
+}
+
 // Debug/Debugf writes a debug message to the log (only if DefaultLogger verbosity is set to HighVerbosity)
 func Debug(msg string) {
 	debugCommonf(stringFormat, msg)

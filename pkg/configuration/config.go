@@ -28,7 +28,12 @@ func ConfigFromResourcesContainer(resources *collector.ResourcesContainerModel,
 	logging.Infof("the parsed config details: %s", config.getConfigInfoStr(params.Color))
 	logging.Debugf("additional config info: %s", config.additionalConfigInfo(params.Color))
 
-	logging.Debug2f("the dfw evaluated rules details:\n%s", config.FW.AllEvaluatedRulesDetails())
+	if logging.Debug2Verbosity() {
+		// Only build this (potentially expensive) string when debug2 logging is actually
+		// enabled: Debug2f's arguments are evaluated eagerly regardless of log level, so an
+		// unguarded call here would always pay the cost - and risk - of building it.
+		logging.Debug2f("the dfw evaluated rules details:\n%s", config.FW.AllEvaluatedRulesDetails())
+	}
 
 	return config, nil
 }
