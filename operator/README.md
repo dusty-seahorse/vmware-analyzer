@@ -45,7 +45,7 @@ containing the NSX manager connection details. Create it before applying a CR, e
 the `test` secret referenced by `config/samples/nsx_v1alpha1_nsxmigration.yaml`:
 
 ```sh
-kubectl create secret generic test -n default \
+kubectl create secret generic test -n operator-system \
   --from-literal=url='https://<nsx-manager-host>' \
   --from-literal=username='<nsx-username>' \
   --from-literal=password='<nsx-password>' \
