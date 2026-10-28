@@ -111,7 +111,15 @@ func getDNFsForOperands(config *configuration.Config, isExcluded bool, group str
 	nestedExpr, okNested := elem.(*collector.NestedExpression)
 	switch {
 	case okCond:
-		return DNF{{getAtomicsForCondition(isExcluded, cond, group)}}
+		atom := getAtomicsForCondition(isExcluded, cond, group)
+		if atom == nil {
+			// unsupported condition type (e.g. IPAddress/ALL conditions used by NSX's built-in
+			// Default Malicious IP Block Rules) - contributes nothing to the DNF. Wrapping a nil
+			// Atomic into a Term here would leave a nil interface value inside it, which later
+			// panics the first time anything calls .String()/.contains() on that Term.
+			return nil
+		}
+		return DNF{{atom}}
 	case okPath:
 		return getDNFOfPath(config, isExcluded, path, group)
 	case okNested:

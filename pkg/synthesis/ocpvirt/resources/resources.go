@@ -91,7 +91,12 @@ func (g *Generated) printPoliciesDetails() {
 	g.addNetpolSectionDetails(sections)
 	g.addPolicyAnnotationsDetails(sections)
 
-	logging.Infof("the generated policy details: %s", sections.GenerateSectionsString())
+	if logging.InfoVerbosity() {
+		// Only build this (potentially expensive) string when info logging is actually enabled:
+		// Infof's arguments are evaluated eagerly regardless of log level, so an unguarded call
+		// here would always pay the cost - and risk - of building it.
+		logging.Infof("the generated policy details: %s", sections.GenerateSectionsString())
+	}
 }
 
 const (
