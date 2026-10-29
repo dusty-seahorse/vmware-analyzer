@@ -19,12 +19,20 @@ type JSONResults struct {
 }
 
 // ConfigAsJSON returns JSONResults objects, capruting various NSX config/anslysis/synthesis data in JSON strings format.
+// Topology and Connectivity are only populated by the Runner when it ran the "analyze" command
+// (see runAnalyzer() in runner.go, which is the sole place that sets parsedConfig/analyzedConnectivity);
+// a Runner invoked with "generate" (or "lint"/"collect") never sets those fields. Rather than
+// dereferencing nil state and panicking, leave the corresponding JSON section empty in that case,
+// so callers (e.g. the operator, which currently only runs "generate") get the sections that are
+// actually available instead of crashing.
 func (o *Observations) ConfigAsJSON() (res *JSONResults, err error) {
 	res = &JSONResults{}
 
-	// topology
-	if res.Topology, err = o.r.parsedConfig.TopologyToJSON(); err != nil {
-		return nil, err
+	// topology (only available when the runner ran the "analyze" command)
+	if o.r.parsedConfig != nil {
+		if res.Topology, err = o.r.parsedConfig.TopologyToJSON(); err != nil {
+			return nil, err
+		}
 	}
 
 	// segmentation
@@ -33,10 +41,12 @@ func (o *Observations) ConfigAsJSON() (res *JSONResults, err error) {
 		return nil, err
 	}
 
-	// connectivity
-	if res.Connectivity, err = o.r.analyzedConnectivity.GenConnectivityOutput(
-		&common.OutputParameters{Format: common.JSONFormat}); err != nil {
-		return nil, err
+	// connectivity (only available when the runner ran the "analyze" command)
+	if o.r.analyzedConnectivity != nil {
+		if res.Connectivity, err = o.r.analyzedConnectivity.GenConnectivityOutput(
+			&common.OutputParameters{Format: common.JSONFormat}); err != nil {
+			return nil, err
+		}
 	}
 
 	// generated netpols
