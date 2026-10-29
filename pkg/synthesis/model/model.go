@@ -161,9 +161,14 @@ func NSXConfigToAbstractModel(
 
 	// pre-processing rules
 	preProcessingCategoryToPolicy, groupToDNF := PreProcessing(nsxConfig, nsxConfig.FW.CategoriesSpecs)
-	logging.Debugf("pre processing symbolic rules\n=============================\n%s",
-		PrintPreProcessingSymbolicPolicy(
-			nsxConfig.FW.CategoriesSpecs, preProcessingCategoryToPolicy, options.Color))
+	if logging.DebugVerbosity() {
+		// Only build this (potentially expensive) string when debug logging is actually enabled:
+		// Debugf's arguments are evaluated eagerly regardless of log level, so an unguarded call
+		// here would always pay the cost - and risk - of building it.
+		logging.Debugf("pre processing symbolic rules\n=============================\n%s",
+			PrintPreProcessingSymbolicPolicy(
+				nsxConfig.FW.CategoriesSpecs, preProcessingCategoryToPolicy, options.Color))
+	}
 
 	// computes disjoint groups, based on "hints" given by the user, and potentially current groups snapshot
 	inferredHints := inferDisjointGroups(nsxConfig.Groups, options.InferHints, groupToDNF)
@@ -195,7 +200,12 @@ func NSXConfigToAbstractModel(
 	abstractModel.addLabelsInfo()
 
 	// print generated abstract model
-	logging.Debugf("abstract model\n==============\n%s", StrAbstractModel(abstractModel, options))
+	if logging.DebugVerbosity() {
+		// Only build this (potentially expensive) string when debug logging is actually enabled:
+		// Debugf's arguments are evaluated eagerly regardless of log level, so an unguarded call
+		// here would always pay the cost - and risk - of building it.
+		logging.Debugf("abstract model\n==============\n%s", StrAbstractModel(abstractModel, options))
+	}
 
 	return abstractModel, nil
 }

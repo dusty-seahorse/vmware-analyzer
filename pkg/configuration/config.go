@@ -25,8 +25,15 @@ func ConfigFromResourcesContainer(resources *collector.ResourcesContainerModel,
 	config := parser.getConfig()
 
 	// in debug/verbose mode -- print the parsed config
-	logging.Infof("the parsed config details: %s", config.getConfigInfoStr(params.Color))
-	logging.Debugf("additional config info: %s", config.additionalConfigInfo(params.Color))
+	// Only build these (potentially expensive) strings when the corresponding verbosity is
+	// actually enabled: Infof/Debugf's arguments are evaluated eagerly regardless of log level,
+	// so an unguarded call here would always pay the cost - and risk - of building them.
+	if logging.InfoVerbosity() {
+		logging.Infof("the parsed config details: %s", config.getConfigInfoStr(params.Color))
+	}
+	if logging.DebugVerbosity() {
+		logging.Debugf("additional config info: %s", config.additionalConfigInfo(params.Color))
+	}
 
 	if logging.Debug2Verbosity() {
 		// Only build this (potentially expensive) string when debug2 logging is actually
