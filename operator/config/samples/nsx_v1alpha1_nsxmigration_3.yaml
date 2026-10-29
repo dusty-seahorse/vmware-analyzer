@@ -10,4 +10,4 @@ spec:
   url: ''
   secret:
     name: 'my-nsx'
-    namespace: 'default'
+    namespace: 'operator-system'

@@ -10,4 +10,4 @@ spec:
   url: ''
   secret:
     name: 'db-user-pass-new'
-    namespace: 'default'
+    namespace: 'operator-system'

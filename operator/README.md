@@ -38,6 +38,26 @@ make deploy IMG=<some-registry>/operator:tag
 > **NOTE**: If you encounter RBAC errors, you may need to grant yourself cluster-admin
 privileges or be logged in as admin.
 
+**Create the NSX credentials secret:**
+
+Each `NSXMigration` CR references a `Secret` (via `spec.secret.name`/`spec.secret.namespace`)
+containing the NSX manager connection details. Create it before applying a CR, e.g. to match
+the `test` secret referenced by `config/samples/nsx_v1alpha1_nsxmigration.yaml`:
+
+```sh
+kubectl create secret generic test -n operator-system \
+  --from-literal=url='https://<nsx-manager-host>' \
+  --from-literal=username='<nsx-username>' \
+  --from-literal=password='<nsx-password>' \
+  --from-literal=insecureSkipVerify='true'
+```
+
+The secret must contain `url`, `username`, and `password` keys; `insecureSkipVerify`
+(`"true"`/`"false"`) is optional and defaults to strict TLS verification when omitted.
+
+> **NOTE**: The NSX manager URL is read from this secret's `url` key. The CR's own top-level
+`spec.url` field is not currently used by the controller.
+
 **Create instances of your solution**
 You can apply the samples (examples) from the config/sample:
 
