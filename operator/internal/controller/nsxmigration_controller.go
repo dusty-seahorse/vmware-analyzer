@@ -341,7 +341,7 @@ func (r *NSXMigrationReconciler) nsxMigration(cr *nsxv1alpha1.NSXMigration, ctx 
 
 	runnerObj, err := runner.NewRunnerWithOptionsList(
 		runner.WithHighVerbosity(true),
-		runner.WithLogFile("debug/log.txt"),
+		runner.WithLogFile("/tmp/debug/log.txt"),
 		runner.WithNSXURL(conn.url),
 		runner.WithNSXUser(conn.user),
 		runner.WithNSXPassword(conn.password),
