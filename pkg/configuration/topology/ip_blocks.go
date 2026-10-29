@@ -28,7 +28,11 @@ type RuleIPBlock struct {
 }
 
 func NewRuleIPBlock(ip string, block *netset.IPBlock) *RuleIPBlock {
-	return &RuleIPBlock{IPBlock: IPBlock{Block: block, OriginalIP: ip}}
+	// ExternalRange defaults to an empty block (rather than nil) so that String(), HasExternal(),
+	// and HasInternalIPNotInSegments() are safe to call before the real external range is computed
+	// and assigned later in the pipeline (see nsxConfigParser.getExternalIPs() in topology.go, which
+	// also leaves ExternalRange unset entirely when there is no external IP range at all).
+	return &RuleIPBlock{IPBlock: IPBlock{Block: block, OriginalIP: ip}, ExternalRange: netset.NewIPBlock()}
 }
 
 func (block *RuleIPBlock) String() string {
